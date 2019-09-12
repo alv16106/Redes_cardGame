@@ -20,10 +20,7 @@ class Server:
         while True:
             msg = clientsocket.recv(1024)
             # do some checks and if msg == disconnect: break:
-            print(addr, ' >> ', msg)
-            msg = input('SERVER >> ')
-            # GAME CODE
-            clientsocket.send(msg)
+            print("recieved")
         clientsocket.close()
 
     def accepting_connections(self):
@@ -41,7 +38,8 @@ class Server:
             self.address.append(address)
             print("Connection has been established :" + address[0])
             self.threads.append(threading.Thread(target=self.handle_client, args=(conn, address)))
-            
+            self.threads[-1].start()
+
 
 if __name__ == "__main__":
     server = Server(5000, "localhost")
