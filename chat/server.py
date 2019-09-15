@@ -1,5 +1,7 @@
 import socket
 import threading
+import pickle
+import room as rooms
 
 
 class Server:
@@ -10,20 +12,28 @@ class Server:
         self.connections = []
         self.address = []
         self.threads = []
+        self.rooms = {}
         self.s = socket.socket()
         self.s.bind((host, port))
         self.s.listen(5)
         self.accepting_connections()
 
-    def handle_client(self, clientsocket, addr):
-        clientsocket.send(str.encode("ls"))
-        while True:
-            msg = clientsocket.recv(1024)
-            # do some checks and if msg == disconnect: break:
-            print("recieved")
-        clientsocket.close()
+    def handle_new(self, clientsocket, addr):
+        print(self.rooms)
+        clientsocket.send(pickle.dumps([*self.rooms]))
+        msg = pickle.loads(clientsocket.recv(1024))
+        # do some checks and if msg == disconnect: break:
+        if msg['room'] in self.rooms:
+            user = {'nick': msg['nick'], 'sock': clientsocket, 'addr': addr}
+            self.rooms[msg['room']].add_user(user)
+
+    def create_room(self, name):
+        print(self.rooms, ' rooms available')
+        self.rooms[name] = rooms.Room(self.s, name)
 
     def accepting_connections(self):
+        self.create_room('first')
+        self.create_room('second')
         for c in self.connections:
             c.close()
 
@@ -37,9 +47,12 @@ class Server:
             self.connections.append(conn)
             self.address.append(address)
             print("Connection has been established :" + address[0])
-            self.threads.append(threading.Thread(target=self.handle_client, args=(conn, address)))
+            self.threads.append(threading.Thread(target=self.handle_new, args=(conn, address)))
             self.threads[-1].start()
+        self.s.close()
 
 
 if __name__ == "__main__":
-    server = Server(5000, "localhost")
+    server = Server(5001, "localhost")
+    server.create_room('first')
+    server.create_room('second')

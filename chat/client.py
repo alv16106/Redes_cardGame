@@ -1,6 +1,7 @@
 import socket
 import os
 import subprocess
+import pickle
 
 
 class Client:
@@ -14,6 +15,11 @@ class Client:
         self.handle_session()
 
     def handle_session(self):
+        rooms = pickle.loads(self.s.recv(1024))
+        print('Available rooms: ', rooms)
+        room = input('Select room: ')
+        nickname = input('Select a nickname: ')
+        self.s.send(pickle.dumps({'room': room, 'nick': nickname}))
         while True:
             data = self.s.recv(1024)
             print(data.decode('utf-8'))
@@ -22,4 +28,4 @@ class Client:
 
 
 if __name__ == "__main__":
-    client = Client(5000, 'localhost')
+    client = Client(5001, 'localhost')
