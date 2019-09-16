@@ -86,7 +86,7 @@ def game(current_stage='DAY'):
 
 
 while IN_GAME == 0:
-    time.sleep(5)
+    time.sleep(1)
     SIGN_IN_PLAYERS.append('testplayer')
     IN_GAME = get_players()
 
