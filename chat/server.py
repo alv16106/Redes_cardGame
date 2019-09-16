@@ -1,7 +1,7 @@
 import socket
 import threading
 import pickle
-import room as rooms
+import room
 
 
 class Server:
@@ -19,7 +19,6 @@ class Server:
         self.accepting_connections()
 
     def handle_new(self, clientsocket, addr):
-        print(self.rooms)
         clientsocket.send(pickle.dumps([*self.rooms]))
         msg = pickle.loads(clientsocket.recv(1024))
         # do some checks and if msg == disconnect: break:
@@ -29,7 +28,7 @@ class Server:
 
     def create_room(self, name):
         print(self.rooms, ' rooms available')
-        self.rooms[name] = rooms.Room(self.s, name)
+        self.rooms[name] = room.Room(self.s, name)
 
     def accepting_connections(self):
         self.create_room('first')
@@ -47,8 +46,9 @@ class Server:
             self.connections.append(conn)
             self.address.append(address)
             print("Connection has been established :" + address[0])
-            self.threads.append(threading.Thread(target=self.handle_new, args=(conn, address)))
-            self.threads[-1].start()
+            nt = threading.Thread(target=self.handle_new, args=(conn, address))
+            nt.start()
+            self.threads.append(nt)
         self.s.close()
 
 
