@@ -125,14 +125,16 @@ def validate_game(users):
     return 0
 
 
-users = ['a', 'b', 'c', 'd', 'e']
+# data for testing
 
-roles = {
-    'mafia': 'evil',
-    'town': 'good'
-}
+# users = ['a', 'b', 'c', 'd', 'e']
 
-print(generate_roles(users, roles))
+# roles = {
+#     'mafia': 'evil',
+#     'town': 'good'
+# }
 
-test_users = generate_roles(users, roles)
-test_votes = [0, 0, 1, 0, 7]
+# print(generate_roles(users, roles))
+
+# test_users = generate_roles(users, roles)
+# test_votes = [0, 0, 1, 0, 7]
