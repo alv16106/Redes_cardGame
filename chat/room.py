@@ -22,6 +22,9 @@ class Room:
             if not msg:
                 break
             # do some checks and if msg == disconnect: break:
+            msg = pickle.loads(msg)
+            if msg['code'] == 10:
+                pass
             print("recieved in room: ", self.name)
             self.broadcast(nick, msg)
         clientsocket.close()
