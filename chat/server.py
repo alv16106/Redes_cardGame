@@ -2,6 +2,7 @@ import socket
 import threading
 import pickle
 import room
+import utils
 
 
 class Server:
@@ -18,21 +19,39 @@ class Server:
         self.s.listen(5)
         self.accepting_connections()
 
-    def handle_new(self, clientsocket, addr):
-        clientsocket.send(pickle.dumps([*self.rooms]))
-        msg = pickle.loads(clientsocket.recv(1024))
+    def handle_new(self, c_sock, addr):
+        c_sock.send(pickle.dumps([*self.rooms]))
+        while True:
+            msg = c_sock.recv(1024)
+            if not msg:
+                break
+            # do some checks and if msg == disconnect: break:
+            msg = pickle.loads(msg)
+            print(msg)
+            pl = msg['payload']
+            if msg['code'] == 40:
+                if pl['room'] in self.rooms:
+                    user = {'nick': pl['nick'], 'sock': c_sock, 'addr': addr}
+                    self.rooms[pl['room']].add_user(user)
+                    break
+                else:
+                    message = pickle.dumps(utils.create_message('SERVER', 'Room not existant'))
+                    c_sock.send(message)
+            elif msg['code'] == 50:
+                pl = msg['payload']
+                self.create_room(pl['roomname'], pl['max_players'])
+            else:
+                message = pickle.dumps(utils.create_message('SERVER', 'No es posible realizar esta acción'))
+                c_sock.send(message)
         # do some checks and if msg == disconnect: break:
-        if msg['room'] in self.rooms:
-            user = {'nick': msg['nick'], 'sock': clientsocket, 'addr': addr}
-            self.rooms[msg['room']].add_user(user)
 
-    def create_room(self, name):
+    def create_room(self, name, max_users):
         print(self.rooms, ' rooms available')
-        self.rooms[name] = room.Room(self.s, name)
+        self.rooms[name] = room.Room(self.s, name, max_users)
 
     def accepting_connections(self):
-        self.create_room('first')
-        self.create_room('second')
+        self.create_room('first', 5)
+        self.create_room('second', 5)
         for c in self.connections:
             c.close()
 
@@ -53,6 +72,4 @@ class Server:
 
 
 if __name__ == "__main__":
-    server = Server(5001, "localhost")
-    server.create_room('first')
-    server.create_room('second')
+    server = Server(5000, "localhost")

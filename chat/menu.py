@@ -1,8 +1,3 @@
-import blessed
-
-term = blessed.Terminal()
-isFirst = True
-
 options = {
   '/cr': 'Create Room',
   '/jr': 'Join Room',
@@ -11,13 +6,14 @@ options = {
   '/execute': 'Vote for the user to kill',
   '/h': 'Help'
 }
+NOT_FOUND = ' not found, please try again (/h for help on available commands)'
 
 
 def showOptions(args=''):
     print('Commands')
     # Iterate over options
     for key, value in options.items():
-        print(term.bold(term.center(key + ': ' + value)))
+        print(key + ': ' + value)
 
 
 def menu(functions):
@@ -37,6 +33,6 @@ def menu(functions):
                 arg = message[2 + len(command):]
                 functions[command](arg)
             else:
-                print('Command ' + command + ' not found, please try again (/h for help on available commands)')
+                print('Command ' + command + NOT_FOUND)
         else:
             functions['send_message'](message)

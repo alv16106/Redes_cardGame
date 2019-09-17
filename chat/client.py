@@ -3,6 +3,7 @@ import os
 import subprocess
 import threading
 import pickle
+from menu import menu
 
 
 class Client:
@@ -19,39 +20,47 @@ class Client:
     def reciever(self):
         while True:
             data = self.s.recv(1024)
-            print(pickle.loads(data))
+            msg = pickle.loads(data)
+            print(msg['payload']['from'] + '>' + msg['payload']['body'])
 
     def handle_session(self):
         rooms = pickle.loads(self.s.recv(1024))
         print('Available rooms: ', rooms)
-        room = input('Select room: ')
         if not self.nick:
             self.nick = input('Select a nickname: ')
-        self.s.send(pickle.dumps({'room': room, 'nick': self.nick}))
-        nt = threading.Thread(target=self.reciever, args=())
-        nt.start()
-        while True:
-            msg = input('envie algo: ')
-            self.s.send(str.encode(msg))
+        functions = {
+            'cr': self.create_room,
+            'jr': self.join_room,
+            'whisper': self.send_private,
+            'kill': self.kill_player,
+            'execute': self.execute_player,
+            'send_message': self.send_broadcast,
+        }
+        self.menuInstance = threading.Thread(target=menu, args=(functions,))
+        self.menuInstance.start()
+        self.reciever()
 
     # este lo hizo usted amiguito
     def join_room(self, args):
-        self.s.send(pickle.dumps({'room': args, 'nick': self.nick}))
         # yo creo que deberia ser asi
-        # self.s.send(
-        #     pickle.dumps(
-        #         {'code': 40, 'payload':
-        #             {'room': int(args)}}
-        #     )
-        # )
+        self.s.send(
+            pickle.dumps(
+                {'code': 40, 'payload':
+                    {'room': args, 'nick': self.nick}}
+            )
+        )
+
+    def send_broadcast(self, args):
+        msg_dict = {}
+        msg_dict['code'] = 0
+        msg_dict['payload'] = {'from': self.nick, 'body': args}
+        self.s.send(pickle.dumps(msg_dict))
 
     def send_private(self, args):
         msg = input('Message: ')
         msg_dict = {}
         msg_dict['code'] = 10
-        msg_dict['payload']['from'] = self.nick
-        msg_dict['payload']['to'] = args
-        msg_dict['payload']['msg'] = msg
+        msg_dict['payload'] = {'to': args, 'body': msg}
         self.s.send(pickle.dumps(msg_dict))
 
     def execute_player(self, args):
@@ -71,4 +80,5 @@ class Client:
         )
 
 if __name__ == "__main__":
-    client = Client(5001, 'localhost')
+    client = Client(5000, 'localhost')
+    
