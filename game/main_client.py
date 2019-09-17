@@ -1,4 +1,3 @@
-
 import time
 import cards
 
@@ -15,6 +14,14 @@ class Server:
         self.MAX_PLAYERS = max_players
         self.VALID_ROLES = valid_roles
         self.ASSIGNED_PLAYERS = assigned_players
+        self.current_stage = "DAY"
+
+    def run(self):
+        while self.IN_GAME == 1:
+            if cards.validate_game(self.ASSIGNED_PLAYERS) == 0:
+                self.current_stage = game(self.current_stage)
+            else:
+                break  # TODO: show winner
 
     def get_players(self):
         # broadcast a msg now recieving subscriptions for the game

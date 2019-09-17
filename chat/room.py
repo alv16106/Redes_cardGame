@@ -6,11 +6,12 @@ import utils
 
 class Room:
 
-    def __init__(self, socket, name):
+    def __init__(self, socket, name, max_users):
         self.socket = socket
         self.members = []
         self.name = name
         self.threads = []
+        self.max = max_users
 
     def handle_client(self, client):
         nick = client['nick']

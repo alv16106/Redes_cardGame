@@ -34,6 +34,12 @@ class Client:
             msg = input('envie algo: ')
             self.s.send(str.encode(msg))
 
+    def join_room(self, args):
+        self.s.send(pickle.dumps({'room': args, 'nick': self.nick}))
+
+    def send_private(self, args):
+        msg = input('Message: ')
+        self.s.send()
 
 if __name__ == "__main__":
     client = Client(5001, 'localhost')
