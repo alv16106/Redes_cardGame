@@ -3,6 +3,7 @@ import threading
 import pickle
 import room
 import utils
+import sys
 
 
 class Server:
@@ -80,4 +81,6 @@ class Server:
 
 
 if __name__ == "__main__":
-    server = Server(5000, "localhost")
+    host = sys.argv[1]
+    port = sys.argv[2]
+    server = Server(port, host)

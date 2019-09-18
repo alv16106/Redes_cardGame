@@ -3,6 +3,7 @@ import os
 import subprocess
 import threading
 import pickle
+import sys
 from menu import menu
 
 
@@ -87,4 +88,6 @@ class Client:
         self.s.send(pickle.dumps({'code': 60, 'payload': 0}))
 
 if __name__ == "__main__":
-    client = Client(5000, 'localhost')
+    host = sys.argv[1]
+    port = sys.argv[2]
+    client = Client(port, host)
