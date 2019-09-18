@@ -125,6 +125,33 @@ def validate_game(users):
     return 0
 
 
+# GENERATE THE WINNER WINNER CHICKEN DINNER TEAM
+def winner_game(users):
+    good = 0
+    evil = 0
+    for user in users:
+        if users[user]['role'] == 'mafia' and users[user]['status'] == 1:
+            evil += 1
+        if users[user]['role'] == 'town' and users[user]['status'] == 1:
+            good += 1
+
+    if good == 0:
+        return 'evil'
+    elif evil == 0:
+        return 'good'
+    return 'no winner'
+
+
+# GET THE USERS (LIST) THAT ARE ALIVE FROM PLAYERS(DICT)
+def alive_users(users):
+    alive_users = []
+    for user in users:
+        if users[user]['status'] == 1:
+            alive_users.append(users[user]['name']) 
+
+    return alive_users
+
+
 # data for testing
 
 # users = ['a', 'b', 'c', 'd', 'e']
@@ -138,3 +165,6 @@ def validate_game(users):
 
 # test_users = generate_roles(users, roles)
 # test_votes = [0, 0, 1, 0, 7]
+# test_users = alter_user(test_users, 0, 0)
+
+# print(alive_users(test_users))
