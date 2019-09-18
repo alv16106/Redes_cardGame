@@ -48,9 +48,10 @@ class Room:
             elif msg['code'] == 30:
                 if self.game.IN_GAME and self.game.current_stage == 'NIGHT':
                     a_s, alive = cards.alive_users(self.game.ASSIGNED_PLAYERS)
-                    if nick in alive and nick in d:
+                    if nick in alive and cards.check_mafia(self.game.ASSIGNED_PLAYERS, nick):
                         self.game.VOTES.append(pl['vote'])
-                        
+                    else:
+                        self.send_message('SERVER', 'Not mafia/ Dead', nick)
                     continue
                 m = utils.create_msg('SERVER', 'Not yet...')
                 clientsocket.send(pickle.dumps(m))
@@ -74,6 +75,9 @@ class Room:
     def start_game(self):
         self.game.IN_GAME = 1
         theboys = cards.generate_roles(self.members.keys(), self.roles)
+        for boi in theboys.values():
+            self.send_message('SERVER', 'Your role is: ' +
+                              boi['role'], boi['name'])
         self.game.ASSIGNED_PLAYERS = theboys
         game_thread = threading.Thread(target=self.game.run, args=())
         game_thread.start()

@@ -23,7 +23,10 @@ class Game:
             if cards.validate_game(self.ASSIGNED_PLAYERS) == 0:
                 self.current_stage = self.game(self.current_stage)
             else:
-                break  # TODO: show winner
+                self.IN_GAME = 0
+                winner = cards.winner_game(self.ASSIGNED_PLAYERS)
+                self.broadcast('SERVER', 'El ganador es: \n' +
+                               winner + '!!')
 
     def player_roles(self):
         self.ROLED_PLAYERS = cards.generate_roles(
