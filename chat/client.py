@@ -21,6 +21,9 @@ class Client:
         while True:
             data = self.s.recv(1024)
             msg = pickle.loads(data)
+            if msg['code'] == 200:
+                print('Welcome to the room!')
+                continue
             print(msg['payload']['from'] + '>' + msg['payload']['body'])
 
     def handle_session(self):
@@ -72,12 +75,16 @@ class Client:
         self.s.send(pickle.dumps({'code': 30, 'payload': {'vote': int(args)}}))
 
     def create_room(self, args):
+        s = args.split(' ')
         self.s.send(
             pickle.dumps(
                 {'code': 50, 'payload':
-                    {'roomname': args[0], 'max_players': int(args[1])}}
+                    {'roomname': s[0], 'max_players': int(s[1])}}
             )
         )
+
+    def get_rooms(self):
+        self.s.send(pickle.dumps({'code': 60, 'payload': 0}))
 
 if __name__ == "__main__":
     client = Client(5000, 'localhost')

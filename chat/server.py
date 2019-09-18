@@ -29,20 +29,28 @@ class Server:
             msg = pickle.loads(msg)
             print(msg)
             pl = msg['payload']
+
+            # Join a room
             if msg['code'] == 40:
                 if pl['room'] in self.rooms:
                     user = {'nick': pl['nick'], 'sock': c_sock, 'addr': addr}
                     self.rooms[pl['room']].add_user(user)
                     break
                 else:
-                    message = pickle.dumps(utils.create_message('SERVER', 'Room not existant'))
-                    c_sock.send(message)
+                    m = utils.create_msg('SERVER', 'Room not existant')
+                    c_sock.send(pickle.dumps(m))
             elif msg['code'] == 50:
                 pl = msg['payload']
                 self.create_room(pl['roomname'], pl['max_players'])
+            elif msg['code'] == 60:
+                r = []
+                for name, room in self.rooms.items():
+                    r.append(name) if len(room.members) < room.max else None
+                m = utils.create_msg('SERVER', r)
+                c_sock.send(pickle.dumps(m))
             else:
-                message = pickle.dumps(utils.create_message('SERVER', 'No es posible realizar esta acción'))
-                c_sock.send(message)
+                m = utils.create_msg('SERVER', 'No es posible realizar esta acción')
+                c_sock.send(pickle.dumps(m))
         # do some checks and if msg == disconnect: break:
 
     def create_room(self, name, max_users):
@@ -50,7 +58,7 @@ class Server:
         self.rooms[name] = room.Room(self.s, name, max_users)
 
     def accepting_connections(self):
-        self.create_room('first', 5)
+        self.create_room('first', 3)
         self.create_room('second', 5)
         for c in self.connections:
             c.close()

@@ -2,6 +2,8 @@ import socket
 import threading
 import pickle
 import utils
+import game.cards as cards
+from game.main_client import Game
 
 
 class Room:
@@ -12,11 +14,13 @@ class Room:
         self.name = name
         self.threads = []
         self.max = max_users
+        self.roles = {'mafia': 'evil', 'town': 'good'}
+        self.game = Game(self.max, self.roles, {})
 
     def handle_client(self, client):
         nick = client['nick']
         clientsocket = client['sock']
-        clientsocket.send(pickle.dumps({'code': 0, 'payload': 'ok'}))
+        clientsocket.send(pickle.dumps({'code': 200, 'payload': 'ok'}))
         while True:
             msg = clientsocket.recv(1024)
             if not msg:
@@ -29,26 +33,48 @@ class Room:
             elif msg['code'] == 10:
                 self.send_message(nick, pl['body'], pl['to'])
             elif msg['code'] == 20:
-                pass
+                if self.game.IN_GAME or self.game.current_stage == 'EXECUTE':
+                    self.game.VOTES.append(pl['vote'])
+                    continue
+                m = utils.create_msg('SERVER', 'Not yet...')
+                clientsocket.send(pickle.dumps(m))
             elif msg['code'] == 30:
-                pass
+                if self.game.IN_GAME or self.game.current_stage == 'NIGHT':
+                    self.game.VOTES.append(pl['vote'])
+                    continue
+                m = utils.create_msg('SERVER', 'Not yet...')
+                clientsocket.send(pickle.dumps(m))
             else:
-                m = utils.create_message('SERVER', 'No es posible realizar esta acción')
+                m = utils.create_msg('SERVER', 'You can not do this here')
                 clientsocket.send(pickle.dumps(m))
         clientsocket.close()
 
-    def add_user(self, new_client):
-        self.members[new_client['nick']] = new_client
-        ut = threading.Thread(target=self.handle_client, args=(new_client, ))
-        ut.start()
-        self.threads.append(ut)
+    def add_user(self, client):
+        if len(self.members) == self.max:
+            response = utils.create_msg('SERVER', 'Room already full')
+            client['sock'].send(pickle.dumps(response))
+        else:
+            self.members[client['nick']] = client
+            ut = threading.Thread(target=self.handle_client, args=(client, ))
+            ut.start()
+            self.threads.append(ut)
+            if len(self.members) == self.max:
+                self.start_game()
+
+    def start_game(self):
+        self.game.IN_GAME = 1
+        theboys = cards.generate_roles(self.members.keys(), self.roles)
+        self.game.ASSIGNED_PLAYERS = theboys
+        game_thread = threading.Thread(target=self.game.run, args=())
+        game_thread.start()
+        self.broadcast('SERVER', 'GAME READY TO START!')
 
     def broadcast(self, sender, body):
-        message = pickle.dumps(utils.create_message(sender, body))
+        message = pickle.dumps(utils.create_msg(sender, body))
         for user in self.members.values():
             if user['nick'] is not sender:
                 user['sock'].send(message)
 
     def send_message(self, sender, body, to):
-        message = pickle.dumps(utils.create_message(sender, body))
+        message = pickle.dumps(utils.create_msg(sender, body))
         self.members[to]['sock'].send(message)

@@ -1,8 +1,8 @@
 import time
-import cards
+import game.cards as cards
 
 
-class Server:
+class Game:
     IN_GAME = 0
     MAX_PLAYERS = 0
     SIGN_IN_PLAYERS = []
@@ -17,22 +17,12 @@ class Server:
         self.current_stage = "DAY"
 
     def run(self):
+        print('game starto')
         while self.IN_GAME == 1:
             if cards.validate_game(self.ASSIGNED_PLAYERS) == 0:
-                self.current_stage = game(self.current_stage)
+                self.current_stage = self.game(self.current_stage)
             else:
                 break  # TODO: show winner
-
-    def get_players(self):
-        # broadcast a msg now recieving subscriptions for the game
-        print("Reciving players")
-        # check if registered players equals the maximum stipulated strt
-        if len(self.SIGN_IN_PLAYERS) == self.MAX_PLAYERS:
-            # announce to the players that game is starting
-            print("Game starting")
-            return 1
-        else:
-            return 0
 
     def player_roles(self):
         self.ROLED_PLAYERS = cards.generate_roles(
@@ -90,7 +80,7 @@ class Server:
             return 'DAY'
 
 
-# los bois que se registarton
+""" # los bois que se registarton
 temproles = {'mafia': 'evil', 'town': 'good'}
 test = ['a', 'b', 'c']
 theboys = cards.generate_roles(test, temproles)
@@ -104,7 +94,7 @@ servercito.VOTES = false_votes
 servercito.game('EXECUTE')
 
 # probar a ver si funciono
-print(servercito.ASSIGNED_PLAYERS)
+print(servercito.ASSIGNED_PLAYERS) """
 
 # while IN_GAME == 0:
 #     time.sleep(5)
