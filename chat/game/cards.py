@@ -151,7 +151,7 @@ def alive_users(users):
 
     return alive_users
 
-
+# CHECK IF USER IS MAFIA
 def check_mafia(users, username):
     for player in users:
         if users[player]['name'] == username:
