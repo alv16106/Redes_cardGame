@@ -15,7 +15,12 @@ class Room:
         self.threads = []
         self.max = max_users
         self.roles = {'mafia': 'evil', 'town': 'good'}
-        self.game = Game(self.max, self.roles, {})
+        self.game = Game(
+                        self.max,
+                        self.roles,
+                        {},
+                        self.broadcast,
+                        self.send_message)
 
     def handle_client(self, client):
         nick = client['nick']
@@ -28,19 +33,24 @@ class Room:
             # do some checks and if msg == disconnect: break:
             msg = pickle.loads(msg)
             pl = msg['payload']
+
             if msg['code'] == 0:
                 self.broadcast(nick, pl['body'])
             elif msg['code'] == 10:
                 self.send_message(nick, pl['body'], pl['to'])
             elif msg['code'] == 20:
-                if self.game.IN_GAME or self.game.current_stage == 'EXECUTE':
-                    self.game.VOTES.append(pl['vote'])
+                if self.game.IN_GAME and self.game.current_stage == 'EXECUTE':
+                    a_s, alive = cards.alive_users(self.game.ASSIGNED_PLAYERS)
+                    self.game.VOTES.append(pl['vote']) if nick in alive else None
                     continue
                 m = utils.create_msg('SERVER', 'Not yet...')
                 clientsocket.send(pickle.dumps(m))
             elif msg['code'] == 30:
-                if self.game.IN_GAME or self.game.current_stage == 'NIGHT':
-                    self.game.VOTES.append(pl['vote'])
+                if self.game.IN_GAME and self.game.current_stage == 'NIGHT':
+                    a_s, alive = cards.alive_users(self.game.ASSIGNED_PLAYERS)
+                    if nick in alive and nick in d:
+                        self.game.VOTES.append(pl['vote'])
+                        
                     continue
                 m = utils.create_msg('SERVER', 'Not yet...')
                 clientsocket.send(pickle.dumps(m))

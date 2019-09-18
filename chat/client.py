@@ -88,4 +88,3 @@ class Client:
 
 if __name__ == "__main__":
     client = Client(5000, 'localhost')
-    

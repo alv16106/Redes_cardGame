@@ -10,14 +10,15 @@ class Game:
     VALID_ROLES = {}
     VOTES = []
 
-    def __init__(self, max_players, valid_roles, assigned_players):
+    def __init__(self, max_players, v_roles, a_players, broadcast, private):
         self.MAX_PLAYERS = max_players
-        self.VALID_ROLES = valid_roles
-        self.ASSIGNED_PLAYERS = assigned_players
+        self.VALID_ROLES = v_roles
+        self.ASSIGNED_PLAYERS = a_players
         self.current_stage = "DAY"
+        self.broadcast = broadcast
+        self.private = private
 
     def run(self):
-        print('game starto')
         while self.IN_GAME == 1:
             if cards.validate_game(self.ASSIGNED_PLAYERS) == 0:
                 self.current_stage = self.game(self.current_stage)
@@ -40,21 +41,26 @@ class Game:
         if current_stage == 'DAY':
             # enable all chat
 
-            print("DAY\n")
+            self.broadcast('SERVER', 'Day time, you have 35 sec to discuss')
             time.sleep(35)
             # Change current_stage
             return 'EXECUTE'
         if current_stage == 'EXECUTE':
             # enable /execute option
 
-            print("EXECUTE PHASE\n")
-            print("type '/execute <number>' to vote\n")
+            self.broadcast('SERVER', 'DISCUSSION IS OVER, EXECUTE VOTING TIME')
+            alive_s, alive = cards.alive_users(self.ASSIGNED_PLAYERS)
+            self.broadcast('SERVER', 'THIS PLAYERS ARE STILL ALIVE:\n' +
+                           str(alive_s) +
+                           " type '/execute <number>' to vote\n You have 15 sec")
             time.sleep(15)
             # execute a player
             user, votes = cards.select_user(self.ASSIGNED_PLAYERS, self.VOTES)
-            print(
-                "USER: " + str(user) + " EXECUTED W/ IMPUNITY BY" + str(votes)
-                )
+            self.broadcast('SERVER', "USER: " +
+                           str(user) +
+                           " EXECUTED W/ IMPUNITY BY" + str(votes))
+            self.private('SERVER', 'YOU ARE DEAD!', self.ASSIGNED_PLAYERS[user]['name'])
+
             # change the current player roster
             self.ASSIGNED_PLAYERS = cards.alter_user(
                 self.ASSIGNED_PLAYERS, user, 0
@@ -65,12 +71,14 @@ class Game:
         if current_stage == 'NIGHT':
             # enable /execute option
 
-            print("NIGHT\n")
-            print("type '/kill <number>' to vote\n")
+            self.broadcast('SERVER', 'NIGHT, MAFIA HAVE 35 sec TO KILL\n' +
+                           "type '/kill <number>' to vote\n")
             time.sleep(35)
             # kill a player
             user, votes = cards.select_user(self.ASSIGNED_PLAYERS, self.VOTES)
-            print("USER: " + str(user) + " BUTCHERED BY EVIL\n")
+            self.broadcast('SERVER', "USER: " +
+                           str(user) + " BUTCHERED BY EVIL\n")
+            self.private('SERVER', 'YOU ARE DEAD!', self.ASSIGNED_PLAYERS[user]['name'])
             # change the current player roster
             self.ASSIGNED_PLAYERS = cards.alter_user(
                 self.ASSIGNED_PLAYERS, user, 0

@@ -145,11 +145,12 @@ def winner_game(users):
 # GET THE USERS (LIST) THAT ARE ALIVE FROM PLAYERS(DICT)
 def alive_users(users):
     alive_users = []
+    user_str = ""
     for user in users:
         if users[user]['status'] == 1:
-            alive_users.append(users[user]['name']) 
-
-    return alive_users
+            alive_users.append(users[user]['name'])
+            user_str += str(user) + ': ' + users[user]['name'] + '\n'
+    return user_str, alive_users
 
 
 # data for testing
