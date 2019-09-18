@@ -35,6 +35,7 @@ class Client:
         functions = {
             'cr': self.create_room,
             'jr': self.join_room,
+            'rooms': self.get_rooms,
             'whisper': self.send_private,
             'kill': self.kill_player,
             'execute': self.execute_player,
@@ -84,10 +85,10 @@ class Client:
             )
         )
 
-    def get_rooms(self):
+    def get_rooms(self, args):
         self.s.send(pickle.dumps({'code': 60, 'payload': 0}))
 
 if __name__ == "__main__":
     host = sys.argv[1]
-    port = sys.argv[2]
+    port = int(sys.argv[2])
     client = Client(port, host)

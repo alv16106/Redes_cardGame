@@ -60,7 +60,7 @@ class Game:
             # execute a player
             user, votes = cards.select_user(self.ASSIGNED_PLAYERS, self.VOTES)
             self.broadcast('SERVER', "USER: " +
-                           str(user) +
+                           self.ASSIGNED_PLAYERS[user]['name'] +
                            " EXECUTED W/ IMPUNITY BY" + str(votes))
             self.private('SERVER', 'YOU ARE DEAD!', self.ASSIGNED_PLAYERS[user]['name'])
 
@@ -76,11 +76,16 @@ class Game:
 
             self.broadcast('SERVER', 'NIGHT, MAFIA HAVE 35 sec TO KILL\n' +
                            "type '/kill <number>' to vote\n")
+            alive_s, alive = cards.alive_users(self.ASSIGNED_PLAYERS)
+            self.broadcast('SERVER', 'THIS PLAYERS ARE STILL ALIVE:\n' +
+                           str(alive_s) +
+                           " type '/execute <number>' to vote\n You have 15 sec")
             time.sleep(35)
             # kill a player
             user, votes = cards.select_user(self.ASSIGNED_PLAYERS, self.VOTES)
             self.broadcast('SERVER', "USER: " +
-                           str(user) + " BUTCHERED BY EVIL\n")
+                           self.ASSIGNED_PLAYERS[user]['name'] +
+                           " BUTCHERED BY EVIL\n")
             self.private('SERVER', 'YOU ARE DEAD!', self.ASSIGNED_PLAYERS[user]['name'])
             # change the current player roster
             self.ASSIGNED_PLAYERS = cards.alter_user(

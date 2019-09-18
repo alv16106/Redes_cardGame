@@ -4,6 +4,7 @@ options = {
   '/whisper': 'Send private message',
   '/kill': 'Kill user, only available for mafia',
   '/execute': 'Vote for the user to kill',
+  '/rooms': 'Show all rooms,',
   '/h': 'Help'
 }
 NOT_FOUND = ' not found, please try again (/h for help on available commands)'

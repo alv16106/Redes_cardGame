@@ -47,7 +47,7 @@ class Server:
                 r = []
                 for name, room in self.rooms.items():
                     r.append(name) if len(room.members) < room.max else None
-                m = utils.create_msg('SERVER', r)
+                m = utils.create_msg('SERVER', str(r))
                 c_sock.send(pickle.dumps(m))
             else:
                 m = utils.create_msg('SERVER', 'No es posible realizar esta acción')
@@ -82,5 +82,5 @@ class Server:
 
 if __name__ == "__main__":
     host = sys.argv[1]
-    port = sys.argv[2]
+    port = int(sys.argv[2])
     server = Server(port, host)
