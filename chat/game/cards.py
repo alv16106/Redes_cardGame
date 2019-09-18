@@ -152,6 +152,13 @@ def alive_users(users):
             user_str += str(user) + ': ' + users[user]['name'] + '\n'
     return user_str, alive_users
 
+# CHECK IF USER IS MAFIA
+def check_mafia(users, username):
+    for player in users:
+        if users[player]['name'] == username:
+            if users[player]['role'] == 'mafia':
+                return 1
+    return 0
 
 # data for testing
 
@@ -169,3 +176,5 @@ def alive_users(users):
 # test_users = alter_user(test_users, 0, 0)
 
 # print(alive_users(test_users))
+
+# print(check_mafia(test_users, 'a'))
