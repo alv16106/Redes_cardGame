@@ -19,6 +19,7 @@ class Game:
         self.private = private
 
     def run(self):
+        self.current_stage = "DAY"
         while self.IN_GAME == 1:
             if cards.validate_game(self.ASSIGNED_PLAYERS) == 0:
                 self.current_stage = self.game(self.current_stage)
@@ -26,7 +27,8 @@ class Game:
                 self.IN_GAME = 0
                 winner = cards.winner_game(self.ASSIGNED_PLAYERS)
                 self.broadcast('SERVER', 'El ganador es: \n' +
-                               winner + '!!')
+                               winner + '!! \n' +
+                               'Do /restart to play again')
 
     def player_roles(self):
         self.ROLED_PLAYERS = cards.generate_roles(

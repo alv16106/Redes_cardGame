@@ -55,6 +55,8 @@ class Room:
                     continue
                 m = utils.create_msg('SERVER', 'Not yet...')
                 clientsocket.send(pickle.dumps(m))
+            elif msg['code'] == 70:
+                self.start_game()
             else:
                 m = utils.create_msg('SERVER', 'You can not do this here')
                 clientsocket.send(pickle.dumps(m))
@@ -74,6 +76,7 @@ class Room:
 
     def start_game(self):
         self.game.IN_GAME = 1
+        self.game.VOTES = []
         theboys = cards.generate_roles(self.members.keys(), self.roles)
         for boi in theboys.values():
             self.send_message('SERVER', 'Your role is: ' +

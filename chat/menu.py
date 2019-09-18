@@ -1,9 +1,9 @@
 options = {
-  '/cr': 'Create Room',
-  '/jr': 'Join Room',
-  '/whisper': 'Send private message',
-  '/kill': 'Kill user, only available for mafia',
-  '/execute': 'Vote for the user to kill',
+  '/cr <name> <max_players>': 'Create Room',
+  '/jr <room>': 'Join Room',
+  '/whisper <user>': 'Send private message',
+  '/kill <int>': 'Kill user, only available for mafia',
+  '/execute <int>': 'Vote for the user to kill',
   '/rooms': 'Show all rooms,',
   '/h': 'Help'
 }
@@ -15,6 +15,7 @@ def showOptions(args=''):
     # Iterate over options
     for key, value in options.items():
         print(key + ': ' + value)
+    print('\n')
 
 
 def menu(functions):

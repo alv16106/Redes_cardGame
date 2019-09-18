@@ -40,6 +40,7 @@ class Client:
             'kill': self.kill_player,
             'execute': self.execute_player,
             'send_message': self.send_broadcast,
+            'restart': self.restart
         }
         self.menuInstance = threading.Thread(target=menu, args=(functions,))
         self.menuInstance.start()
@@ -87,6 +88,9 @@ class Client:
 
     def get_rooms(self, args):
         self.s.send(pickle.dumps({'code': 60, 'payload': 0}))
+
+    def restart(self, args=''):
+        self.s.send(pickle.dumps({'code': 70, 'payload': 0}))
 
 if __name__ == "__main__":
     host = sys.argv[1]
