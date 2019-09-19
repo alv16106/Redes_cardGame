@@ -81,7 +81,7 @@ class Game:
             alive_s, alive = cards.alive_users(self.ASSIGNED_PLAYERS)
             self.broadcast('SERVER', 'THIS PLAYERS ARE STILL ALIVE:\n' +
                            str(alive_s) +
-                           " type '/execute <number>' to vote\n You have 15 sec")
+                           " type '/kill <number>' to vote\n You have 15 sec")
             time.sleep(35)
             # kill a player
             user, votes = cards.select_user(self.ASSIGNED_PLAYERS, self.VOTES)

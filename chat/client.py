@@ -25,7 +25,7 @@ class Client:
             if msg['code'] == 200:
                 print('Welcome to the room!')
                 continue
-            print(msg['payload']['from'] + '>' + msg['payload']['body'])
+            print(msg['payload']['from'] + ' >' + msg['payload']['body'])
 
     def handle_session(self):
         rooms = pickle.loads(self.s.recv(1024))

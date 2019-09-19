@@ -21,6 +21,17 @@ def showOptions(args=''):
 def menu(functions):
     """ Show menu for the first time and update isFirst flag so that the menu
     knows further usages of showOptions are in a different term possition """
+    print('\nGet ready to play MAFIA! You will need to choose a nickname,' +
+          ' then join or create a room \n')
+    print('Once you are in a room, you can chat with the other players but' +
+          ' will have to wait for the room to reach the number of players' +
+          ' defined by the creator \n')
+    print('Once in a game you are asigned a role, good or evil. If you are' +
+          ' evil you can vote for a person to die at night with your evil ' +
+          'compatriots, else, you will vote at daytime for someone you ' +
+          'suspect is evil to die. \n Village wins when there are no more ' +
+          'evil oponents, evil wins when they overpower the villagers \n')
+    input('Press any key to continue...')
     showOptions()
     isFirst = False
     functions['h'] = showOptions
