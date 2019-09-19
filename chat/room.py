@@ -79,8 +79,8 @@ class Room:
         self.game.VOTES = []
         theboys = cards.generate_roles(self.members.keys(), self.roles)
         for boi in theboys.values():
-            self.send_message('SERVER', 'Your role is: ' +
-                              boi['role'], boi['name'])
+            self.send_message('SERVER', '\n Your role is: ' +
+                              boi['role'] + '\n', boi['name'])
         self.game.ASSIGNED_PLAYERS = theboys
         game_thread = threading.Thread(target=self.game.run, args=())
         game_thread.start()
